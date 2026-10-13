@@ -71,3 +71,11 @@ MPLBACKEND=Agg python house_price_analysis.py   # Agg = no GUI windows; omit to 
 * `house_price_analysis_notebook.ipynb` expects the **MapReduce-cleaned** CSV (columns `SQUARE_M`, `TARGET(PRICE_IN_BGP)`), which is not in the repo, and it needs `unicodecsv`. It fails with `KeyError: 'SQUARE_M'` on the raw `train.csv`.
 * The Java MapReduce jobs were not run (they need a Hadoop installation).
 * `DataFilter.jar` was committed in the first commit and still sits in git history (about 45 MB). It was removed from the working tree but history was not rewritten.
+
+## Tests
+
+```bash
+pip install -r requirements-dev.txt && pytest      # Python (uses tests/fixtures, plus train.csv for one end-to-end test)
+mvn test                                           # Java: mapper/reducer logic with a mocked Hadoop Context, no cluster
+```
+Both run in GitHub Actions (`.github/workflows/tests.yml`).
