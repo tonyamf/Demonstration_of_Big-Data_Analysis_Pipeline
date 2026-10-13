@@ -6,6 +6,7 @@ This script performs data analysis and builds a linear regression model
 to predict house prices in India based on the Kaggle dataset.
 """
 
+import os
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -136,7 +137,8 @@ def main():
     """
     Main function to run the data analysis and modeling pipeline.
     """
-    filepath = 'train.csv'
+    # Resolve train.csv next to this script so it runs from any directory
+    filepath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'train.csv')
     prices_dataset = load_and_prepare_data(filepath)
     
     if prices_dataset is None:

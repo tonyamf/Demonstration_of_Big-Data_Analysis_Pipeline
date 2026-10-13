@@ -33,8 +33,8 @@ The dataset used is from the Kaggle competition **"Predict the house prices in I
 
 ## Key Findings
 
-* **Feature Correlation:** The house's area (`SQUARE_M`) has the highest positive correlation (0.41) with its price. The `RESALE` status has the strongest negative correlation (-0.20).
-* **Model Performance:** The linear regression models achieved a low Coefficient of Determination (R²) ranging from 0.19 to 0.36. This indicates that a linear model alone is not sufficient to accurately capture the complex factors influencing house prices in this dataset. The model that included all features, including `POSTED_BY` as a numerical category, performed the best among the variations tested.
+* **Feature Correlation:** The house's area (`SQUARE_M`) has the highest positive correlation with price (0.40 in the run of `house_price_analysis.py`; the original write-up said 0.41). The `RESALE` status has the strongest negative correlation (-0.21 in that run; the original write-up said -0.20).
+* **Model Performance:** The linear regression models achieved a low Coefficient of Determination (R²) ranging from 0.17 to 0.34 in the re-run of `house_price_analysis.py` (the original write-up said 0.19 to 0.36; the difference is most likely due to library versions). This indicates that a linear model alone is not sufficient to accurately capture the complex factors influencing house prices in this dataset. In that re-run the Owner-only model had the highest R² (0.34); the all-listings model with `POSTED_BY` as a numeric code scored 0.24.
 
 ---
 
@@ -42,11 +42,13 @@ The dataset used is from the Kaggle competition **"Predict the house prices in I
 
 ### Java MapReduce (Data Cleaning)
 
-Located in `src.java`, this code is intended for a Hadoop environment. It contains several MapReduce jobs:
+Located in `src/DataFilfer/`, this code is intended for a Hadoop environment. It contains several MapReduce jobs:
 
-* `DublicateChecker` / `DublicateCounter` / `DublicateRemover`: Finds, counts, and removes duplicate entries. (*Correction: Renamed from "Dublicate"*).
+* `DublicateChecker` / `DublicateCounter` / `DublicateRemover`: Finds, counts, and removes duplicate entries. (class and file names keep the original "Dublicate" spelling).
 * `FeatureRemover`: Removes the `BHK_OR_RK` column and converts units.
 * `EmptyFeatues`: Scans for rows with missing values.
+
+The Java sources were not compiled or run in the HubRefine check (no Hadoop cluster; Maven Central was rate-limiting at the time). They import `org.apache.hadoop.*` and need the Hadoop client libraries (e.g. 3.3.x) on the classpath, e.g. `javac -cp "$(hadoop classpath)" -d build src/DataFilfer/*.java`.
 
 ### Python Script (Analysis & Prediction)
 
@@ -56,23 +58,16 @@ The `house_price_analysis.py` script contains the complete workflow for analysis
 
 ## How to Run the Python Analysis
 
-1.  **Prerequisites:**
-    * Python 3.x
-    * Pandas
-    * Matplotlib
-    * Scikit-learn
-    * Statsmodels
+```bash
+python3 -m venv .venv && . .venv/bin/activate
+pip install -r requirements.txt
+MPLBACKEND=Agg python house_price_analysis.py   # Agg = no GUI windows; omit to see the plots
+```
 
-    You can install these packages using pip:
-    ```bash
-    pip install pandas matplotlib scikit-learn statsmodels
-    ```
+`train.csv` (the raw Kaggle data) is read from the script's own folder. The script converts units itself (sq ft to m², INR lacs to GBP at 94.94), so it does not need the Hadoop output. It prints the correlations and the four regression results.
 
-2.  **Execute the Script:**
-    * Ensure the `train.csv` file is in the same directory as the script.
-    * Run the script from your terminal:
-    ```bash
-    python house_price_analysis.py
-    ```
-    The script will perform the analysis and print the model evaluation results to the console. It will also generate and display plots for the exploratory data analysis.
+### Known limitations
 
+* `house_price_analysis_notebook.ipynb` expects the **MapReduce-cleaned** CSV (columns `SQUARE_M`, `TARGET(PRICE_IN_BGP)`), which is not in the repo, and it needs `unicodecsv`. It fails with `KeyError: 'SQUARE_M'` on the raw `train.csv`.
+* The Java MapReduce jobs were not run (they need a Hadoop installation).
+* `DataFilter.jar` was committed in the first commit and still sits in git history (about 45 MB). It was removed from the working tree but history was not rewritten.
