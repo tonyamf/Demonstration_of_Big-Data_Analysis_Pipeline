@@ -1,0 +1,6 @@
+# Versions that installed and ran cleanly on Python 3.11 (see HubRefine notes)
+pandas==3.0.6
+numpy==2.4.6
+matplotlib==3.11.2
+scikit-learn==1.9.1
+statsmodels==0.15.0
