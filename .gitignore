@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+.idea/
+*.iml
+out/
+bin/
+obj/
+*.class
+*.jar
+.ipynb_checkpoints/
